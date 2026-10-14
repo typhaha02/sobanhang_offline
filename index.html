@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sổ bán hàng</title>
+<meta name="theme-color" content="#0d6efd">
+<link rel="manifest" href="./manifest.webmanifest">
+
+<style>
+:root{
+    --main:#0d6efd;
+    --bg:#f4f6f8;
+    --card:#fff;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto;
+    background:var(--bg);
+}
+header{
+    background:var(--main);
+    color:#fff;
+    padding:12px 16px;
+    font-size:20px;
+    font-weight:bold;
+    position:sticky;
+    top:0;
+}
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:12px;
+}
+.card{
+    background:var(--card);
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:14px;
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+.card h3{margin:0 0 10px}
+.row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.row>*{flex:1}
+input{
+    width:100%;
+    padding:10px;
+    font-size:16px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    text-align:right;
+}
+input[type=date]{text-align:left}
+input[readonly]{
+    background:#f1f3f5;
+    font-weight:bold;
+}
+button{
+    border:none;
+    border-radius:10px;
+    padding:12px;
+    font-size:16px;
+    cursor:pointer;
+}
+.btn-main{background:var(--main);color:#fff}
+.btn-gray{background:#6c757d;color:#fff}
+.btn-red{background:#dc3545;color:#fff}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+th,td{
+    padding:8px;
+    border-bottom:1px solid #eee;
+}
+th{text-align:left}
+td{text-align:right}
+td:first-child{text-align:left}
+#thuong,#chaBo{table-layout:fixed}
+#thuong th:first-child,#thuong td:first-child{width:25%}
+#thuong th:nth-child(2),#thuong th:nth-child(3){width:16%}
+#thuong th:last-child{width:43%}
+#chaBo th:nth-child(-n+3){width:14%}
+#chaBo th:nth-child(4){width:22%}
+#chaBo th:last-child{width:36%}
+#thuong th,#chaBo th,#thuong td,#chaBo td{padding:5px 2px;overflow:visible}
+#thuong input,#chaBo input{min-width:0;width:100%;padding:8px 2px;font-size:clamp(10px,2.8vw,16px);text-overflow:clip}
+#thuong input[readonly],#chaBo input[readonly]{font-size:clamp(9px,2.5vw,15px);letter-spacing:-.4px}
+.money{overflow-wrap:anywhere}
+@media(max-width:420px){
+ #thuong th,#chaBo th{font-size:12px;overflow-wrap:anywhere}
+ #thuong input,#chaBo input{padding:8px 1px}
+}
+
+.money{
+    font-size:22px;
+    font-weight:bold;
+    color:var(--main);
+}
+</style>
+</head>
+
+<body>
+
+<header>📒 SỔ BÁN HÀNG</header>
+
+<div class="container">
+
+<!-- NGÀY + NÚT -->
+<div class="card">
+    📅 Ngày bán
+    <input type="date" id="ngayBan" onchange="loadNgay()">
+
+    <div class="row" style="margin-top:10px">
+        <button class="btn-main" onclick="luuNgay()">💾 Lưu</button>
+        <button class="btn-gray" onclick="xuatDuLieu()">📤 Xuất</button>
+        <button class="btn-gray" onclick="document.getElementById('importFile').click()">📥 Nhập</button>
+        <button class="btn-red" onclick="resetNgay()">♻️ Reset</button>
+        <input type="file" id="importFile" hidden onchange="nhapDuLieu(this)">
+    </div>
+</div>
+
+<!-- NEM - TRE -->
+<div class="card">
+<h3>🥟 Nem – Tré</h3>
+<table id="thuong">
+<tr><th>Mặt hàng</th><th>Nhập</th><th>Còn</th><th>Doanh thu</th></tr>
+<tr data-gia="70"><td>Nem bao</td><td><input type="number" oninput="tinhThuong(this)"></td><td><input type="number" oninput="tinhThuong(this)"></td><td><input readonly></td></tr>
+<tr data-gia="130"><td>Nem cây</td><td><input type="number" oninput="tinhThuong(this)"></td><td><input type="number" oninput="tinhThuong(this)"></td><td><input readonly></td></tr>
+<tr data-gia="130"><td>Tré lớn</td><td><input type="number" oninput="tinhThuong(this)"></td><td><input type="number" oninput="tinhThuong(this)"></td><td><input readonly></td></tr>
+<tr data-gia="70"><td>Tré nhỏ</td><td><input type="number" oninput="tinhThuong(this)"></td><td><input type="number" oninput="tinhThuong(this)"></td><td><input readonly></td></tr>
+<tr data-gia="25"><td>Tương ớt</td><td><input type="number" oninput="tinhThuong(this)"></td><td><input type="number" oninput="tinhThuong(this)"></td><td><input readonly></td></tr>
+</table>
+</div>
+
+<!-- CHA BO -->
+<div class="card">
+<h3>🥩 Chả bò</h3>
+<table id="chaBo">
+<tr><th>Tổng</th><th>Lớn</th><th>Nhỏ</th><th>Số lượng bán</th><th>Doanh thu</th></tr>
+<tr>
+<td><input type="number" oninput="tinhChaBo()"></td>
+<td><input type="number" oninput="tinhChaBo()"></td>
+<td><input type="number" oninput="tinhChaBo()"></td>
+<td><input readonly></td>
+<td><input readonly></td>
+</tr>
+</table>
+</div>
+
+<!-- CHI TIEU -->
+<div class="card">
+<h3>💸 Chi tiêu</h3>
+<table id="chiTieu"><tbody></tbody></table>
+</div>
+
+<!-- KET QUA -->
+<div class="card">
+<h3>📊 Kết quả</h3>
+<div class="row">
+    <div>Doanh thu<br><span id="tongDoanhThu" class="money">0</span></div>
+    <div>Chi tiêu<br><span id="tongChiTieu" class="money">0</span></div>
+    <div>Lợi nhuận<br><span id="loiNhuan" class="money">0</span></div>
+</div>
+</div>
+
+</div>
+
+<script>
+let ngayDangMo="";
+let autoSaveTimer=null;
+let dangTaiNgay=false;
+let choReset=false;
+function homNayDiaPhuong(){
+ const d=new Date();
+ return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
+}
+window.onload=()=>{
+ ngayBan.value=homNayDiaPhuong();
+ loadNgay();
+ if("serviceWorker" in navigator){
+   navigator.serviceWorker.register("./service-worker.js").catch(console.warn);
+ }
+ document.addEventListener("input",e=>{
+   if(dangTaiNgay || choReset || e.target.id==="ngayBan" || e.target.type==="file")return;
+   clearTimeout(autoSaveTimer);
+   autoSaveTimer=setTimeout(()=>luuNgay(true),250);
+ });
+ document.addEventListener("visibilitychange",()=>{
+   if(document.visibilityState==="hidden"){clearTimeout(autoSaveTimer);luuNgay(true);}
+ });
+ window.addEventListener("pagehide",()=>{clearTimeout(autoSaveTimer);luuNgay(true)});
+};
+
+/* ===== TÍNH ===== */
+function tinhThuong(el){
+    const r=el.closest("tr");
+    const gia=+r.dataset.gia;
+    const nhap=+r.children[1].children[0].value||0;
+    const con=+r.children[2].children[0].value||0;
+    r.children[3].children[0].value=((nhap-con)*gia).toLocaleString("vi-VN");
+    tinhTong();
+}
+
+function tinhChaBo(){
+    const r=document.querySelector("#chaBo tr:last-child");
+    const tong=+r.children[0].children[0].value||0;
+    const lon=+r.children[1].children[0].value||0;
+    const nho=+r.children[2].children[0].value||0;
+    const ban=Math.max(tong-lon-nho,0);
+    r.children[3].children[0].value=ban;
+    r.children[4].children[0].value=(ban*320).toLocaleString("vi-VN");
+    tinhTong();
+}
+
+/* ===== TỔNG (ĐÃ FIX LỖI) ===== */
+function tinhTong(){
+    let dt=0;
+
+    // Doanh thu Nem – Tré
+    document.querySelectorAll("#thuong tr[data-gia]").forEach(r=>{
+        dt+=+(r.children[3].children[0].value.replace(/\./g,""))||0;
+    });
+
+    // Doanh thu Chả bò (CHỈ cột tiền)
+    const cb=document.querySelector("#chaBo tr:last-child").children[4].children[0].value;
+    dt+=+(cb.replace(/\./g,""))||0;
+
+    let ct=0;
+    document.querySelectorAll("#chiTieu input").forEach(i=>ct+=+i.value||0);
+
+    tongDoanhThu.textContent=dt.toLocaleString("vi-VN");
+    tongChiTieu.textContent=ct.toLocaleString("vi-VN");
+    loiNhuan.textContent=(dt-ct).toLocaleString("vi-VN");
+}
+
+/* ===== CHI TIÊU ===== */
+function themDongChiTieu(v=""){
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><input type="number" value="${v}" oninput="tinhTong()"></td>`;
+    document.querySelector("#chiTieu tbody").appendChild(tr);
+}
+
+/* ===== LƯU / LOAD ===== */
+function luuNgay(imLang=false){
+    const d=ngayDangMo || ngayBan.value;
+    if(!d || dangTaiNgay || choReset)return;
+    const data={thuong:[],chaBo:[],chiTieu:[]};
+
+    document.querySelectorAll("#thuong tr[data-gia]").forEach(r=>{
+        data.thuong.push([r.children[1].children[0].value||0,r.children[2].children[0].value||0]);
+    });
+    document.querySelectorAll("#chaBo input").forEach(i=>data.chaBo.push(i.value||0));
+    document.querySelectorAll("#chiTieu input").forEach(i=>data.chiTieu.push(i.value||0));
+
+    localStorage.setItem("soBanHang_"+d,JSON.stringify(data));
+    if(!imLang)alert("Đã lưu ngày "+d);
+}
+
+function loadNgay(){
+    clearTimeout(autoSaveTimer);
+    if(ngayDangMo && ngayDangMo!==ngayBan.value)luuNgay(true);
+    ngayDangMo=ngayBan.value;
+    dangTaiNgay=true;
+    document.querySelectorAll("input:not([type=date])").forEach(i=>i.value="");
+    document.querySelector("#chiTieu tbody").innerHTML="";
+    const raw=localStorage.getItem("soBanHang_"+ngayBan.value);
+    if(!raw){themDongChiTieu();tinhTong();dangTaiNgay=false;return;}
+    const data=JSON.parse(raw);
+
+    document.querySelectorAll("#thuong tr[data-gia]").forEach((r,i)=>{
+        if(data.thuong[i]){
+            r.children[1].children[0].value=data.thuong[i][0];
+            r.children[2].children[0].value=data.thuong[i][1];
+            tinhThuong(r.children[1].children[0]);
+        }
+    });
+    document.querySelectorAll("#chaBo input").forEach((i,idx)=>i.value=data.chaBo[idx]||"");
+    tinhChaBo();
+    (data.chiTieu||[]).forEach(v=>themDongChiTieu(v));
+    if(!document.querySelector("#chiTieu input"))themDongChiTieu();
+    tinhTong();
+    dangTaiNgay=false;
+}
+
+/* ===== KHÁC ===== */
+function resetNgay(){
+    if(confirm("Reset dữ liệu ngày này?")){
+        choReset=true;
+        clearTimeout(autoSaveTimer);
+        localStorage.removeItem("soBanHang_"+ngayBan.value);
+        loadNgay();
+        choReset=false;
+    }
+}
+
+function xuatDuLieu(){
+    luuNgay(true);
+    const data = {};
+
+    for(let i = 0; i < localStorage.length; i++){
+        const key = localStorage.key(i);
+        if(key && key.startsWith("soBanHang_")){
+            data[key] = JSON.parse(localStorage.getItem(key));
+        }
+    }
+
+    if(Object.keys(data).length === 0){
+        alert("⚠️ Chưa có dữ liệu để xuất");
+        return;
+    }
+
+    const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        { type: "application/json" }
+    );
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "so-ban-hang-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(a.href),30000);
+}
+
+
+function nhapDuLieu(input){
+    const r=new FileReader();
+    r.onload=()=>{
+        try{
+          const data=JSON.parse(r.result);
+          Object.keys(data).filter(k=>k.startsWith("soBanHang_")).forEach(k=>localStorage.setItem(k,JSON.stringify(data[k])));
+          loadNgay();
+          alert("Đã nhập dữ liệu thành công");
+        }catch(e){alert("File sao lưu không hợp lệ");}
+    };
+    if(input.files && input.files[0])r.readAsText(input.files[0]);
+}
+</script>
+
+</body>
+</html>
